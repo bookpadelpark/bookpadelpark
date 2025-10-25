@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  bookings  Booking[]
+  createdAt DateTime @default(now())
+}
+
+model Court {
+  id        Int      @id @default(autoincrement())
+  name      String
+  bookings  Booking[]
+}
+
+model Booking {
+  id              Int      @id @default(autoincrement())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int
+  court           Court    @relation(fields: [courtId], references: [id])
+  courtId         Int
+  date            DateTime
+  slot            String
+  paid            Boolean  @default(false)
+  stripeSessionId String?
+  createdAt       DateTime @default(now())
+
+  @@index([courtId, date, slot])
+}
